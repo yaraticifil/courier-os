@@ -1,0 +1,19 @@
+# Android ignores
+.gradle/
+build/
+app/build/
+local.properties
+*.apk
+*.ap_
+
+# Go ignores
+dispatch-service/dispatch-service
+
+# IDE ignores
+.idea/
+*.iml
+.vscode/
+
+# OS ignores
+.DS_Store
+Thumbs.db

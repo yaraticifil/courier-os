@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative Elephant | Live Market Adaptive Dispatch</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #000000;
+            color: #e5e5e5;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(at 10% 20%, rgba(13, 10, 24, 0.6) 0px, transparent 50%),
+                radial-gradient(at 90% 80%, rgba(10, 20, 16, 0.4) 0px, transparent 50%);
+        }
+        
+        .vantablack-panel {
+            background: rgba(8, 8, 8, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        }
+
+        .neon-glow-teal {
+            box-shadow: 0 0 15px rgba(20, 184, 166, 0.15);
+            border-color: rgba(20, 184, 166, 0.3);
+        }
+        
+        .neon-glow-red {
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .neon-glow-amber {
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 2px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Pulse Animations */
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.03); }
+        }
+        .pulse-zone {
+            animation: pulse-slow 3s infinite ease-in-out;
+        }
+        
+        /* Monospace font settings */
+        .terminal-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Status colors */
+        .color-sim { color: #3b82f6; }
+        .color-live { color: #10b981; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-4 md:p-6 lg:p-8">
+
+    <!-- Top Navigation & Brand Header -->
+    <header class="w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 mb-6 pb-6 border-b border-white/5">
+        <div class="flex items-center gap-4">
+            <div class="h-10 w-10 bg-white text-black flex items-center justify-center font-extrabold text-lg tracking-tighter">
+                CE
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold tracking-widest text-white leading-none">CREATIVE ELEPHANT</h1>
+                <p class="text-xs text-neutral-500 tracking-widest uppercase mt-1">COURIER OS // ADAPTIVE DISPATCH ENGINE</p>
+            </div>
+        </div>
+        
+        <!-- Interactive Clock & Active Telemetry Node Badge -->
+        <div class="flex items-center gap-4">
+            <div class="text-right hidden sm:block">
+                <p class="text-xs text-neutral-500 uppercase tracking-wider">SİSTEM ZAMAN DİLİMİ</p>
+                <p class="text-sm font-semibold text-white terminal-font" id="live-clock">00:00:00</p>
+            </div>
+            <a href="app-debug.apk" download class="px-5 py-2.5 bg-white text-black hover:bg-neutral-200 font-semibold text-xs tracking-widest uppercase transition-all duration-300 transform hover:scale-[1.02] active:scale-95 shadow-lg shadow-white/5 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                DOWNLOAD ANDROID APK
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Workspace Grid -->
+    <main class="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch flex-grow">
+        
+        <!-- Column 1: Taktik Lojistik Haritası (Canvas) -->
+        <section class="lg:col-span-5 flex flex-col gap-4">
+            <div class="vantablack-panel border border-white/5 p-4 rounded flex-grow flex flex-col">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="h-2 w-2 rounded-full bg-teal-500 animate-ping"></span>
+                        <h2 class="text-sm font-semibold text-white tracking-widest uppercase">CANLI OPERASYONEL TAKTİK HARİTASI</h2>
+                    </div>
+                    <span class="text-[10px] text-neutral-500 terminal-font" id="map-telemetry-coords">GRID: 600x500</span>
+                </div>
+                
+                <!-- Map Container -->
+                <div class="relative flex-grow bg-black/40 border border-white/5 rounded overflow-hidden min-h-[350px] md:min-h-[420px] flex items-center justify-center">
+                    <canvas id="logistic-map" width="600" height="500" class="w-full h-full block"></canvas>
+                    
+                    <!-- Absolute HUD overlay for quick map controls -->
+                    <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between pointer-events-none">
+                        <div class="bg-black/80 backdrop-filter blur-md px-2.5 py-1 text-[10px] text-neutral-400 border border-white/5 uppercase tracking-wider flex gap-3 pointer-events-auto">
+                            <span class="flex items-center gap-1"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> SERBEST</span>
+                            <span class="flex items-center gap-1"><span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span> MEŞGUL</span>
+                            <span class="flex items-center gap-1"><span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span> SURGE</span>
+                        </div>
+                        <button onclick="resetMapZoom()" class="bg-black/80 hover:bg-neutral-900 border border-white/5 text-[9px] text-white px-2 py-1 uppercase tracking-wider pointer-events-auto transition-all active:scale-95">
+                            HARİTAYI SIFIRLA
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Column 2: Telemetri Göstergeleri & Politika Adaptasyonu -->
+        <section class="lg:col-span-4 flex flex-col gap-6">
+            
+            <!-- Dynamic Telemetry Metrics Panel -->
+            <div class="vantablack-panel border border-white/5 p-4 rounded">
+                <h2 class="text-sm font-semibold text-white tracking-widest uppercase mb-4">SİSTEM GERİ BESLEME TELEMETRİSİ</h2>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white/[0.02] border border-white/5 p-3 rounded">
+                        <p class="text-[10px] text-neutral-500 uppercase tracking-wider">ORT. TESLİMAT SÜRESİ</p>
+                        <p class="text-xl font-bold text-white mt-1 terminal-font" id="metric-avg-delivery">0.00 <span class="text-xs text-neutral-400 font-light font-sans">adım</span></p>
+                        <div class="w-full bg-neutral-900 h-1 mt-2 rounded overflow-hidden">
+                            <div id="bar-avg-delivery" class="bg-teal-500 h-full w-[35%] transition-all duration-500"></div>
+                        </div>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/5 p-3 rounded">
+                        <p class="text-[10px] text-neutral-500 uppercase tracking-wider">KURYE BOŞTA KALMA</p>
+                        <p class="text-xl font-bold text-white mt-1 terminal-font" id="metric-courier-idle">0 <span class="text-xs text-neutral-400 font-light font-sans">adım</span></p>
+                        <div class="w-full bg-neutral-900 h-1 mt-2 rounded overflow-hidden">
+                            <div id="bar-courier-idle" class="bg-amber-500 h-full w-[45%] transition-all duration-500"></div>
+                        </div>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/5 p-3 rounded">
+                        <p class="text-[10px] text-neutral-500 uppercase tracking-wider">BÖLGESEL DENGESİZLİK</p>
+                        <p class="text-xl font-bold text-white mt-1 terminal-font" id="metric-imbalance">0.0%</p>
+                        <div class="w-full bg-neutral-900 h-1 mt-2 rounded overflow-hidden">
+                            <div id="bar-imbalance" class="bg-purple-500 h-full w-[20%] transition-all duration-500"></div>
+                        </div>
+                    </div>
+                    <div class="bg-white/[0.02] border border-white/5 p-3 rounded">
+                        <p class="text-[10px] text-neutral-500 uppercase tracking-wider">GECİKME ORANI</p>
+                        <p class="text-xl font-bold text-white mt-1 terminal-font" id="metric-delay-rate">0.0%</p>
+                        <div class="w-full bg-neutral-900 h-1 mt-2 rounded overflow-hidden">
+                            <div id="bar-delay-rate" class="bg-rose-500 h-full w-[10%] transition-all duration-500"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 bg-white/[0.01] border border-white/5 p-3 rounded">
+                    <div class="flex items-center justify-between text-xs mb-2">
+                        <span class="text-neutral-400">Atama Başarı Oranı (Accuracy)</span>
+                        <span class="font-bold text-teal-400 terminal-font" id="metric-accuracy">100%</span>
+                    </div>
+                    <div class="w-full bg-neutral-900 h-1.5 rounded overflow-hidden">
+                        <div id="bar-accuracy" class="bg-gradient-to-r from-teal-500 to-emerald-400 h-full w-full transition-all duration-500"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Adaptive Policy Hub -->
+            <div class="vantablack-panel border border-white/5 p-4 rounded flex-grow flex flex-col justify-between">
+                <div>
+                    <h2 class="text-sm font-semibold text-white tracking-widest uppercase mb-4">ADAPTİF BÖLGESEL SURGE & KURAL MOTORU</h2>
+                    
+                    <div class="space-y-3" id="zone-rules-container">
+                        <!-- Zones loaded dynamically -->
+                        <div class="border-b border-white/5 pb-2.5">
+                            <div class="flex items-center justify-between text-xs mb-1">
+                                <span class="font-semibold text-white">Kadıköy</span>
+                                <span class="text-emerald-400 font-bold terminal-font" id="surge-Kadikoy">x1.00</span>
+                            </div>
+                            <div class="flex items-center justify-between text-[10px] text-neutral-400">
+                                <span>Arz/Talep: <span id="ratio-Kadikoy" class="text-white">0/0</span></span>
+                                <span>Yoğunluk: <span id="cong-Kadikoy" class="text-white">0%</span></span>
+                            </div>
+                        </div>
+                        <div class="border-b border-white/5 pb-2.5">
+                            <div class="flex items-center justify-between text-xs mb-1">
+                                <span class="font-semibold text-white">Beşiktaş</span>
+                                <span class="text-emerald-400 font-bold terminal-font" id="surge-Besiktas">x1.00</span>
+                            </div>
+                            <div class="flex items-center justify-between text-[10px] text-neutral-400">
+                                <span>Arz/Talep: <span id="ratio-Besiktas" class="text-white">0/0</span></span>
+                                <span>Yoğunluk: <span id="cong-Besiktas" class="text-white">0%</span></span>
+                            </div>
+                        </div>
+                        <div class="pb-1">
+                            <div class="flex items-center justify-between text-xs mb-1">
+                                <span class="font-semibold text-white">Üsküdar</span>
+                                <span class="text-emerald-400 font-bold terminal-font" id="surge-Uskudar">x1.00</span>
+                            </div>
+                            <div class="flex items-center justify-between text-[10px] text-neutral-400">
+                                <span>Arz/Talep: <span id="ratio-Uskudar" class="text-white">0/0</span></span>
+                                <span>Yoğunluk: <span id="cong-Uskudar" class="text-white">0%</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Learning & adaptation logs -->
+                <div class="mt-4 pt-4 border-t border-white/5">
+                    <p class="text-[10px] text-neutral-500 uppercase tracking-wider mb-2">OTONOM ADAPTASYON LOG AKIŞI</p>
+                    <div id="adaptation-feed" class="h-28 overflow-y-auto text-[10px] terminal-font text-neutral-400 space-y-1.5 custom-scrollbar pr-1">
+                        <div><span class="text-neutral-600">[04:00:00]</span> ADAPTIVE DISPATCH ENGINE başlatıldı. Gözlem modu aktif.</div>
+                        <div><span class="text-neutral-600">[04:00:00]</span> Sistem kısıtları yükleniyor. Arama yarıçapı: 150px.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Column 3: Denetim Paneli & Karar Terminali -->
+        <section class="lg:col-span-3 flex flex-col gap-6">
+            
+            <!-- Dual-mode dashboard controller -->
+            <div class="vantablack-panel border border-white/5 p-4 rounded">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-sm font-semibold text-white tracking-widest uppercase">KONTROL MODU</h2>
+                    <span class="px-2 py-0.5 text-[9px] uppercase font-bold tracking-wider rounded border border-teal-500/30 text-teal-400 bg-teal-950/20 animate-pulse" id="current-mode-badge">SIMULATION</span>
+                </div>
+                
+                <!-- Toggle switch -->
+                <div class="flex bg-black border border-white/5 p-1 rounded mb-4">
+                    <button id="btn-toggle-sim" onclick="setMode('simulation')" class="flex-1 text-center py-1.5 text-xs font-semibold tracking-wider transition-all duration-300 rounded bg-white text-black">
+                        SIMULATION
+                    </button>
+                    <button id="btn-toggle-live" onclick="setMode('live')" class="flex-1 text-center py-1.5 text-xs font-semibold tracking-wider transition-all duration-300 rounded text-neutral-400 hover:text-white">
+                        LIVE PROBE
+                    </button>
+                </div>
+                
+                <!-- SIMULATION MODE CONTROLS -->
+                <div id="simulation-controls-panel" class="space-y-4">
+                    <div>
+                        <div class="flex items-center justify-between text-xs mb-1.5">
+                            <span class="text-neutral-400">Tick Frekansı (Hız)</span>
+                            <span class="text-white font-bold terminal-font" id="lbl-speed">1.5s</span>
+                        </div>
+                        <input id="slider-speed" type="range" min="0.5" max="4.0" step="0.1" value="1.5" oninput="changeTickSpeed(this.value)" class="w-full accent-white bg-neutral-900 h-1 rounded-lg cursor-pointer">
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        <button id="btn-play-pause" onclick="togglePlayState()" class="flex-1 py-2 bg-neutral-900 hover:bg-neutral-800 border border-white/10 text-xs font-semibold tracking-widest uppercase text-white transition-all">
+                            DURAKLAT
+                        </button>
+                        <button onclick="triggerTick()" class="px-3 py-2 bg-neutral-900 hover:bg-neutral-800 border border-white/10 text-xs text-white transition-all">
+                            TICK
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 pt-2 border-t border-white/5">
+                        <button onclick="spawnMockCourier()" class="py-1.5 text-[9px] bg-white/[0.03] hover:bg-white/[0.08] border border-white/5 text-white uppercase tracking-wider transition-all">
+                            + MOCK KURYE
+                        </button>
+                        <button onclick="spawnMockOrder()" class="py-1.5 text-[9px] bg-white/[0.03] hover:bg-white/[0.08] border border-white/5 text-white uppercase tracking-wider transition-all">
+                            + MOCK SİPARİŞ
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- LIVE PROBE OVERRIDE PANEL -->
+                <div id="live-probe-controls-panel" class="space-y-3 hidden">
+                    <p class="text-[10px] text-amber-500/80 leading-normal bg-amber-950/20 border border-amber-900/30 p-2 rounded">
+                        <strong>LIVE PROBE OVERRIDE:</strong> Simülatör geçici olarak durdurulur ve sadece sizin enjekte ettiğiniz gerçek verilerle çalışır.
+                    </p>
+                    
+                    <!-- Register Courier Form -->
+                    <div class="p-2.5 bg-white/[0.02] border border-white/5 rounded">
+                        <p class="text-[10px] text-white font-semibold uppercase tracking-wider mb-2">GERÇEK KURYE DÜĞÜMÜ EKLE</p>
+                        <div class="space-y-2">
+                            <input type="text" id="live-courier-name" placeholder="Kurye Ad Soyad" class="w-full bg-black border border-white/10 px-2.5 py-1.5 text-xs text-white placeholder-neutral-600 rounded focus:border-white/30 focus:outline-none">
+                            <div class="flex gap-2">
+                                <select id="live-courier-zone" class="flex-1 bg-black border border-white/10 px-1.5 py-1.5 text-xs text-white rounded focus:outline-none">
+                                    <option value="Kadıköy">Kadıköy</option>
+                                    <option value="Beşiktaş">Beşiktaş</option>
+                                    <option value="Üsküdar">Üsküdar</option>
+                                </select>
+                                <button onclick="registerLiveCourier()" class="px-3 bg-white text-black font-semibold text-[10px] tracking-wider uppercase hover:bg-neutral-200 transition-all">
+                                    KAYDET
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Inject Order Form -->
+                    <div class="p-2.5 bg-white/[0.02] border border-white/5 rounded">
+                        <p class="text-[10px] text-white font-semibold uppercase tracking-wider mb-2">GERÇEK SİPARİŞ ENJEKTE ET</p>
+                        <div class="grid grid-cols-2 gap-2 mb-2">
+                            <div>
+                                <label class="text-[8px] text-neutral-500 uppercase">PICKUP ZONE</label>
+                                <select id="live-order-pickup" class="w-full bg-black border border-white/10 px-1.5 py-1.5 text-xs text-white rounded focus:outline-none">
+                                    <option value="Kadıköy">Kadıköy</option>
+                                    <option value="Beşiktaş" selected>Beşiktaş</option>
+                                    <option value="Üsküdar">Üsküdar</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[8px] text-neutral-500 uppercase">DROPOFF ZONE</label>
+                                <select id="live-order-dropoff" class="w-full bg-black border border-white/10 px-1.5 py-1.5 text-xs text-white rounded focus:outline-none">
+                                    <option value="Kadıköy" selected>Kadıköy</option>
+                                    <option value="Beşiktaş">Beşiktaş</option>
+                                    <option value="Üsküdar">Üsküdar</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button onclick="injectLiveOrder()" class="w-full py-1.5 bg-emerald-500 text-black font-bold text-[10px] tracking-widest uppercase hover:bg-emerald-400 transition-all flex items-center justify-center gap-1">
+                            🚀 SİPARİŞİ ENJEKTE ET
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Real-time JSON API Decision Terminal -->
+            <div class="vantablack-panel border border-white/5 p-4 rounded flex-grow flex flex-col min-h-[220px]">
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-xs font-semibold text-white tracking-widest uppercase">SON ADAPTİF ATAMA KARARI (JSON)</h2>
+                    <span class="text-[9px] text-neutral-500 uppercase tracking-wider terminal-font">API CONTRACT</span>
+                </div>
+                
+                <!-- JSON display -->
+                <div class="flex-grow bg-black border border-white/5 p-3 rounded font-mono text-[10px] leading-relaxed overflow-auto custom-scrollbar select-all text-neutral-400 flex flex-col justify-center min-h-[160px]" id="json-decision-terminal">
+                    <div class="text-neutral-600">// Henüz dispatch kararı üretilmedi. Simülasyonun akmasını veya veri enjeksiyonunu bekleyin...</div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Operational Dashboard Banner -->
+    <footer class="w-full max-w-7xl mx-auto mt-6 pt-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3 text-[10px] text-neutral-500">
+        <div>
+            <span>DURUM: <span class="text-emerald-500 font-semibold" id="system-status-text">AKTİF & EVRİMLEŞİYOR</span></span>
+            <span class="mx-3">|</span>
+            <span>TOPLAM TICK: <span class="text-white terminal-font" id="system-total-ticks">0</span></span>
+            <span class="mx-3">|</span>
+            <span>AKTİF GÖREV YÜKÜ: <span class="text-white terminal-font" id="system-active-tasks">0</span></span>
+        </div>
+        <div class="tracking-widest uppercase">
+            CREATIVE ELEPHANT © 2026 // COURIER OS SYSTEM V3.1
+        </div>
+    </footer>
+
+    <!-- LOGISTICS SIMULATION ENGINE SCRIPT -->
+    <script>
+        // System State Classes
+        class CourierNode {
+            constructor(id, name, zone, x, y) {
+                this.id = id;
+                this.name = name;
+                this.zone = zone;
+                this.x = x;
+                this.y = y;
+                
+                // Live tracking properties
+                this.targetX = x;
+                this.targetY = y;
+                this.isBusy = false;
+                this.idleTicks = 0;
+                this.deliveryCount = 0;
+                this.totalEarnings = 0.0;
+            }
+
+            toDict() {
+                return {
+                    id: this.id,
+                    name: this.name,
+                    zone: this.zone,
+                    busy: this.isBusy,
+                    deliveries: this.deliveryCount,
+                    earnings: Math.round(this.totalEarnings * 100) / 100
+                };
+            }
+        }
+
+        class OrderNode {
+            constructor(id, pickupZone, dropoffZone, pX, pY, dX, dY) {
+                this.id = id;
+                this.pickupZone = pickupZone;
+                this.dropoffZone = dropoffZone;
+                this.pX = pX;
+                this.pY = pY;
+                this.dX = dX;
+                this.dY = dY;
+                
+                this.assignedCourier = null;
+                this.createdAt = Date.now();
+                this.assignedAt = null;
+                this.deliveredAt = null;
+                
+                this.eta = 0;
+                this.initialEta = 0;
+                this.basePayout = 50.0;
+                this.multiplier = 1.0;
+                this.totalPayout = 50.0;
+                
+                // Animation states
+                this.animProgress = 0; // 0: not started, 0 to 1: moving to pickup, 1 to 2: moving to dropoff
+                this.currentX = pX;
+                this.currentY = pY;
+            }
+
+            calculateDistance(cX, cY) {
+                return Math.sqrt(Math.pow(this.pX - cX, 2) + Math.pow(this.pY - cY, 2));
+            }
+        }
+
+        // Zones config
+        const ZONES = {
+            "Beşiktaş": { x: 150, y: 120, radius: 90, color: "rgba(127, 119, 221, 0.15)", border: "rgba(127, 119, 221, 0.4)" },
+            "Üsküdar": { x: 280, y: 280, radius: 95, color: "rgba(29, 158, 117, 0.15)", border: "rgba(29, 158, 117, 0.4)" },
+            "Kadıköy": { x: 450, y: 400, radius: 100, color: "rgba(245, 158, 11, 0.15)", border: "rgba(245, 158, 11, 0.4)" }
+        };
+
+        // System Constants
+        let activeMode = "simulation"; // simulation | live
+        let isPlaying = true;
+        let tickIntervalId = null;
+        let tickDuration = 1500; // default 1.5 seconds
+
+        // Telemetry state
+        let ticksCount = 0;
+        let totalDeliveriesCount = 0;
+        let totalDelaysSum = 0;
+        let activeDecisionsLog = [];
+        let systemLogs = [];
+
+        // Dynamic policies
+        let zoneCongestion = { "Kadıköy": 0.0, "Beşiktaş": 0.0, "Üsküdar": 0.0 };
+        let zonePayoutMultiplier = { "Kadıköy": 1.0, "Beşiktaş": 1.0, "Üsküdar": 1.0 };
+        let zoneSupply = { "Kadıköy": 0, "Beşiktaş": 0, "Üsküdar": 0 };
+        let zoneDemand = { "Kadıköy": 0, "Beşiktaş": 0, "Üsküdar": 0 };
+
+        const policyEngine = {
+            maxMatchingDistance: 180, // pixels base boundary
+            baseEtaFactor: 0.15,      // scalar
+            payoutPerKm: 0.25         // per pixel base coefficient
+        };
+
+        // Data arrays
+        let couriersList = [];
+        let pendingOrdersList = [];
+        let activeOrdersList = [];
+
+        // Counter templates
+        let orderCounter = 1;
+        let courierCounter = 16; // Start above initial count
+
+        // Initial Data Load
+        function initializeSystem() {
+            // Setup initial couriers matching python setup coordinates
+            couriersList = [
+                new CourierNode("C10", "Mert Kaya", "Kadıköy", 440, 390),
+                new CourierNode("C11", "Ahmet Yurt", "Kadıköy", 460, 410),
+                new CourierNode("C12", "Selin Kılıç", "Beşiktaş", 140, 110),
+                new CourierNode("C13", "Caner Demir", "Beşiktaş", 160, 130),
+                new CourierNode("C14", "Burak Tunç", "Üsküdar", 270, 270),
+                new CourierNode("C15", "Hale Gümüş", "Üsküdar", 290, 290)
+            ];
+
+            // Setup real-time clock
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('live-clock').innerText = now.toTimeString().split(' ')[0];
+            }, 1000);
+
+            // Setup Canvas Rendering loop
+            setupCanvas();
+            
+            // Start simulation ticks
+            restartTickInterval();
+            
+            logAdaptation("ADAPTIVE DISPATCH ENGINE: Hazır. Simülasyon başlatıldı.");
+        }
+
+        // Log formatter
+        function logAdaptation(message) {
+            const now = new Date();
+            const timeStr = now.toTimeString().split(' ')[0];
+            const feed = document.getElementById('adaptation-feed');
+            
+            const logItem = document.createElement('div');
+            logItem.innerHTML = `<span class="text-neutral-600">[${timeStr}]</span> ${message}`;
+            feed.appendChild(logItem);
+            
+            // Auto scroll
+            feed.scrollTop = feed.scrollHeight;
+            
+            // Keep feed size limited to avoid DOM bloat
+            if (feed.childNodes.length > 50) {
+                feed.removeChild(feed.firstChild);
+            }
+        }
+
+        // Toggle Controller UI Mode
+        function setMode(mode) {
+            activeMode = mode;
+            
+            const badge = document.getElementById('current-mode-badge');
+            badge.innerText = mode.toUpperCase();
+            
+            const simPanel = document.getElementById('simulation-controls-panel');
+            const livePanel = document.getElementById('live-probe-controls-panel');
+            
+            const btnSim = document.getElementById('btn-toggle-sim');
+            const btnLive = document.getElementById('btn-toggle-live');
+
+            if (mode === "simulation") {
+                badge.className = "px-2 py-0.5 text-[9px] uppercase font-bold tracking-wider rounded border border-teal-500/30 text-teal-400 bg-teal-950/20 animate-pulse";
+                simPanel.classList.remove('hidden');
+                livePanel.classList.add('hidden');
+                btnSim.className = "flex-1 text-center py-1.5 text-xs font-semibold tracking-wider transition-all duration-300 rounded bg-white text-black";
+                btnLive.className = "flex-1 text-center py-1.5 text-xs font-semibold tracking-wider transition-all duration-300 rounded text-neutral-400 hover:text-white";
+                
+                // Auto resume play state
+                if (!isPlaying) {
+                    togglePlayState();
+                }
+                logAdaptation("KONTROL MODU GÜNCELLEMESİ: Otomatik Simülasyon Modu devrede.");
+            } else {
+                badge.className = "px-2 py-0.5 text-[9px] uppercase font-bold tracking-wider rounded border border-emerald-500/30 text-emerald-400 bg-emerald-950/20 animate-pulse";
+                simPanel.classList.add('hidden');
+                livePanel.classList.remove('hidden');
+                btnSim.className = "flex-1 text-center py-1.5 text-xs font-semibold tracking-wider transition-all duration-300 rounded text-neutral-400 hover:text-white";
+                btnLive.className = "flex-1 text-center py-1.5 text-xs font-semibold tracking-wider transition-all duration-300 rounded bg-white text-black";
+                
+                // Pause auto sandbox ticking to let user inject probe data
+                if (isPlaying) {
+                    togglePlayState();
+                }
+                logAdaptation("KONTROL MODU GÜNCELLEMESİ: Gerçek Zamanlı Live Probe moduna geçildi. Otomatik sipariş üretimi duraklatıldı.");
+            }
+        }
+
+        // Toggle Play State
+        function togglePlayState() {
+            isPlaying = !isPlaying;
+            const playBtn = document.getElementById('btn-play-pause');
+            
+            if (isPlaying) {
+                playBtn.innerText = "DURAKLAT";
+                playBtn.classList.remove('bg-emerald-900', 'hover:bg-emerald-800');
+                playBtn.classList.add('bg-neutral-900', 'hover:bg-neutral-800');
+                restartTickInterval();
+                logAdaptation("SİMÜLATÖR EYLEMİ: Çalışma süresi devam ettirildi.");
+            } else {
+                playBtn.innerText = "DEVAM ET";
+                playBtn.classList.remove('bg-neutral-900', 'hover:bg-neutral-800');
+                playBtn.classList.add('bg-emerald-900', 'hover:bg-emerald-800');
+                clearInterval(tickIntervalId);
+                logAdaptation("SİMÜLATÖR EYLEMİ: Zaman durduruldu.");
+            }
+        }
+
+        // Change Tick Frequency
+        function changeTickSpeed(speed) {
+            document.getElementById('lbl-speed').innerText = speed + "s";
+            tickDuration = parseFloat(speed) * 1000;
+            if (isPlaying) {
+                restartTickInterval();
+            }
+        }
+
+        function restartTickInterval() {
+            clearInterval(tickIntervalId);
+            tickIntervalId = setInterval(runTick, tickDuration);
+        }
+
+        function triggerTick() {
+            runTick();
+            logAdaptation("MANUEL TETİKLEME: Tek bir zaman adımı yürütüldü.");
+        }
+
+        // Core System Tick Update Loop
+        function runTick() {
+            ticksCount++;
+            document.getElementById('system-total-ticks').innerText = ticksCount;
+            
+            // 1. Gather Telemetry and Count Supplies / Demands
+            updateZoneTallies();
+            
+            // 2. Run Learning and Policy Adaptations
+            runFeedbackAdaptation();
+            
+            // 3. Spawn Random Sandbox Elements if in simulation mode
+            if (activeMode === "simulation" && Math.random() < 0.65) {
+                spawnMockOrder();
+            }
+            
+            // 4. Process Dispatch Match Engine
+            processDispatchQueue();
+            
+            // 5. Update Transit Orders Progress
+            updateTransitProgress();
+            
+            // 6. Update KPIs UI Displays
+            renderTelemetryUI();
+        }
+
+        // Telemetry Update
+        function updateZoneTallies() {
+            // Reset zone counts
+            for (let z in ZONES) {
+                zoneSupply[z] = 0;
+                zoneDemand[z] = 0;
+            }
+            
+            // Sum free couriers
+            couriersList.forEach(c => {
+                if (!c.isBusy) {
+                    zoneSupply[c.zone]++;
+                    c.idleTicks++;
+                }
+            });
+
+            // Sum pending orders
+            pendingOrdersList.forEach(o => {
+                zoneDemand[o.pickupZone]++;
+            });
+        }
+
+        // Feedback adaptation learning loops
+        function runFeedbackAdaptation() {
+            for (let zone in ZONES) {
+                let supply = zoneSupply[zone];
+                let demand = zoneDemand[zone];
+                let oldSurge = zonePayoutMultiplier[zone];
+                
+                // Pattern Detection: Deficit Check
+                if (demand > supply * 2 && demand > 0) {
+                    // Learning rule: increase surge multiplier and zone congestion values
+                    zoneCongestion[zone] = Math.min(zoneCongestion[zone] + 0.15, 1.0);
+                    zonePayoutMultiplier[zone] = Math.round((1.0 + (demand - supply) * 0.15) * 100) / 100;
+                    
+                    // Cap surge
+                    if (zonePayoutMultiplier[zone] > 2.5) zonePayoutMultiplier[zone] = 2.5;
+
+                    if (zonePayoutMultiplier[zone] !== oldSurge) {
+                        logAdaptation(`OTONOM ADAPTASYON: ${zone} bölgesinde kurye açığı saptandı! Surge katsayısı <span class="text-amber-400 font-semibold">x${zonePayoutMultiplier[zone]}</span> değerine evrildi. Arama sınırı %80 genişletildi.`);
+                    }
+                } else {
+                    // Decay / Recovering back to normal state
+                    zoneCongestion[zone] = Math.max(zoneCongestion[zone] - 0.08, 0.0);
+                    zonePayoutMultiplier[zone] = Math.max(Math.round((zonePayoutMultiplier[zone] - 0.06) * 100) / 100, 1.0);
+                    
+                    if (oldSurge > 1.0 && zonePayoutMultiplier[zone] === 1.0) {
+                        logAdaptation(`OTONOM ADAPTASYON: ${zone} bölgesinde denge sağlandı. Surge çarpanı normale (<span class="text-teal-400 font-semibold">x1.00</span>) döndürüldü.`);
+                    }
+                }
+            }
+        }
+
+        // Dispatch Assignment Core Engine
+        function processDispatchQueue() {
+            if (pendingOrdersList.length === 0) return;
+            
+            let matchedOrders = [];
+            
+            pendingOrdersList.forEach(order => {
+                let bestCourier = null;
+                let minScore = Infinity;
+                let reasons = ["en düşük ETA"];
+                
+                let pickupMultiplier = zonePayoutMultiplier[order.pickupZone];
+                let currentMaxDist = policyEngine.maxMatchingDistance;
+                
+                // Adaptive Constraint Expansion: Pull far away couriers if in demand crisis
+                if (pickupMultiplier > 1.25) {
+                    currentMaxDist = policyEngine.maxMatchingDistance * 1.8; // Expand radius by 80%
+                    reasons.push(`bölgede kurye eksikliği (Surge: +%${Math.round((pickupMultiplier - 1.0) * 100)})`);
+                }
+                
+                // Select best candidate courier
+                couriersList.forEach(c => {
+                    if (c.isBusy) return;
+                    
+                    let dist = order.calculateDistance(c.x, c.y);
+                    if (dist < currentMaxDist) {
+                        // Local zone matchmaking priority advantage
+                        let score = dist;
+                        if (c.zone === order.pickupZone) {
+                            score *= 0.8; // 20% spatial scoring distance discount
+                        }
+                        
+                        if (score < minScore) {
+                            minScore = score;
+                            bestCourier = c;
+                        }
+                    }
+                });
+                
+                // If suitable candidate node approved
+                if (bestCourier) {
+                    bestCourier.isBusy = true;
+                    order.assignedCourier = bestCourier;
+                    order.assignedAt = Date.now();
+                    order.multiplier = pickupMultiplier;
+                    
+                    // Payout scaling
+                    order.totalPayout = Math.round((order.basePayout * order.multiplier + (minScore * policyEngine.payoutPerKm)) * 100) / 100;
+                    
+                    // ETA scaling: distance + traffic delay index
+                    let congestionPenalty = zoneCongestion[order.pickupZone] * 8; // penalty up to 8 ticks
+                    order.initialEta = Math.max(3, Math.round(minScore * policyEngine.baseEtaFactor + 3 + congestionPenalty));
+                    order.eta = order.initialEta;
+                    
+                    if (pickupMultiplier > 1.35) {
+                        reasons.push("yük dengeleme optimizasyonu");
+                    }
+                    
+                    // Mark candidate destination coordinate targets
+                    bestCourier.targetX = order.pX;
+                    bestCourier.targetY = order.pY;
+                    order.animProgress = 0.01; // Start movement animation
+
+                    // Output JSON log matching requested schema
+                    const decision = {
+                        "orderId": order.id,
+                        "courierId": bestCourier.id,
+                        "eta": order.eta,
+                        "reason": reasons,
+                        "mode": activeMode
+                    };
+                    
+                    activeDecisionsLog.push(decision);
+                    updateTerminalDisplay(decision);
+                    
+                    matchedOrders.push(order);
+                    activeOrdersList.push(order);
+                    
+                    logAdaptation(`ATAMA KARARI: ${order.id} siparişi ${bestCourier.name} (${bestCourier.id}) kuryesine atandı. Mod: <span class="uppercase font-bold text-white">${activeMode}</span>.`);
+                }
+            });
+            
+            // Evict matched orders from pending queue
+            pendingOrdersList = pendingOrdersList.filter(o => !matchedOrders.includes(o));
+        }
+
+        // Live Transit simulation updates
+        function updateTransitProgress() {
+            let delivered = [];
+            
+            activeOrdersList.forEach(order => {
+                order.eta--;
+                
+                // Animate courier positions moving to pickup, then to dropoff
+                let c = order.assignedCourier;
+                
+                if (order.eta > order.initialEta / 2) {
+                    // Moving to pickup
+                    order.animProgress = 0.01 + (1.0 - (order.eta - (order.initialEta/2)) / (order.initialEta/2));
+                    c.x = c.x + (order.pX - c.x) * 0.45;
+                    c.y = c.y + (order.pY - c.y) * 0.45;
+                } else {
+                    // Picked up! Now moving to dropoff
+                    order.animProgress = 1.01 + (1.0 - order.eta / (order.initialEta/2));
+                    c.x = c.x + (order.dX - c.x) * 0.45;
+                    c.y = c.y + (order.dY - c.y) * 0.45;
+                }
+                
+                if (order.eta <= 0) {
+                    // Completed!
+                    order.deliveredAt = Date.now();
+                    c.isBusy = false;
+                    c.x = order.dX;
+                    c.y = order.dY;
+                    c.targetX = order.dX;
+                    c.targetY = order.dY;
+                    c.deliveryCount++;
+                    c.totalEarnings += order.totalPayout;
+                    
+                    totalDeliveriesCount++;
+                    totalDelaysSum += order.initialEta;
+                    delivered.push(order);
+                    
+                    logAdaptation(`TESLİMAT BAŞARILI: ${order.id} siparişi kurye ${c.name} tarafından teslim edildi. Payout: <span class="text-teal-400 font-semibold">${order.totalPayout} TL</span>.`);
+                }
+            });
+            
+            activeOrdersList = activeOrdersList.filter(o => !delivered.includes(o));
+        }
+
+        // Spawn mock sandboxed structures
+        function spawnMockCourier() {
+            let zones = Object.keys(ZONES);
+            let selectedZone = zones[Math.floor(Math.random() * zones.length)];
+            let center = ZONES[selectedZone];
+            
+            // Random jitter within radius
+            let angle = Math.random() * Math.PI * 2;
+            let distance = Math.random() * (center.radius * 0.7);
+            let x = center.x + Math.cos(angle) * distance;
+            let y = center.y + Math.sin(angle) * distance;
+            
+            let id = "C" + courierCounter++;
+            let mockNames = ["Yiğit Aras", "Buse Çelik", "Can Soylu", "Elif Yıldız", "Kaan Demir", "Ece Aksoy", "Deniz Şahin"];
+            let name = mockNames[Math.floor(Math.random() * mockNames.length)];
+            
+            let c = new CourierNode(id, name, selectedZone, x, y);
+            couriersList.push(c);
+            logAdaptation(`SİMÜLATÖR DÜĞÜMÜ: Yeni kurye ${name} (${id}) ${selectedZone} bölgesinde doğdu.`);
+        }
+
+        function spawnMockOrder() {
+            let zones = Object.keys(ZONES);
+            let pZone = zones[Math.floor(Math.random() * zones.length)];
+            
+            // High demand bias for Kadıköy to trigger dynamic surges
+            if (activeMode === "simulation" && Math.random() < 0.5) {
+                pZone = "Kadıköy";
+            }
+            
+            let dZone = zones[Math.floor(Math.random() * zones.length)];
+            
+            let pCenter = ZONES[pZone];
+            let dCenter = ZONES[dZone];
+            
+            let angle1 = Math.random() * Math.PI * 2;
+            let dist1 = Math.random() * (pCenter.radius * 0.6);
+            let pX = pCenter.x + Math.cos(angle1) * dist1;
+            let pY = pCenter.y + Math.sin(angle1) * dist1;
+
+            let angle2 = Math.random() * Math.PI * 2;
+            let dist2 = Math.random() * (dCenter.radius * 0.6);
+            let dX = dCenter.x + Math.cos(angle2) * dist2;
+            let dY = dCenter.y + Math.sin(angle2) * dist2;
+            
+            let id = "ORD_" + String(orderCounter++).padStart(3, '0');
+            
+            let o = new OrderNode(id, pZone, dZone, pX, pY, dX, dY);
+            pendingOrdersList.push(o);
+        }
+
+        // Live Probe manual injection operations
+        function registerLiveCourier() {
+            const nameInput = document.getElementById('live-courier-name');
+            const name = nameInput.value.trim() || "Canlı Operatör Node";
+            const zone = document.getElementById('live-courier-zone').value;
+            
+            let center = ZONES[zone];
+            let angle = Math.random() * Math.PI * 2;
+            let distance = Math.random() * (center.radius * 0.4);
+            let x = center.x + Math.cos(angle) * distance;
+            let y = center.y + Math.sin(angle) * distance;
+            
+            let id = "C-LIVE-" + String(courierCounter++);
+            
+            let c = new CourierNode(id, name, zone, x, y);
+            couriersList.push(c);
+            
+            nameInput.value = "";
+            logAdaptation(`LIVE PROBE DOĞRULAMA: Gerçek kurye düğümü kaydedildi -> ${name} (${id}) - Bölge: ${zone}`);
+            
+            // Force tick update
+            updateZoneTallies();
+            renderTelemetryUI();
+        }
+
+        function injectLiveOrder() {
+            const pZone = document.getElementById('live-order-pickup').value;
+            const dZone = document.getElementById('live-order-dropoff').value;
+            
+            let pCenter = ZONES[pZone];
+            let dCenter = ZONES[dZone];
+            
+            let angle1 = Math.random() * Math.PI * 2;
+            let pX = pCenter.x + Math.cos(angle1) * (pCenter.radius * 0.4);
+            let pY = pCenter.y + Math.sin(angle1) * (pCenter.radius * 0.4);
+
+            let angle2 = Math.random() * Math.PI * 2;
+            let dX = dCenter.x + Math.cos(angle2) * (dCenter.radius * 0.4);
+            let dY = dCenter.y + Math.sin(angle2) * (dCenter.radius * 0.4);
+            
+            let id = "ORD-LIVE-" + String(orderCounter++).padStart(3, '0');
+            
+            let o = new OrderNode(id, pZone, dZone, pX, pY, dX, dY);
+            pendingOrdersList.push(o);
+            
+            logAdaptation(`LIVE PROBE ENJEKSİYON: Gerçek lojistik siparişi enjekte edildi -> ${id}. Alım: ${pZone} -> Teslim: ${dZone}`);
+            
+            // Force run dispatch tick immediately to process the live override order
+            runTick();
+        }
+
+        // Render Telemetry Screen Indicators
+        function renderTelemetryUI() {
+            // Stats Calculations
+            let avgDeliveryVal = totalDeliveriesCount > 0 ? (totalDelaysSum / totalDeliveriesCount) : 0.0;
+            let totalIdleTicks = 0;
+            couriersList.forEach(c => {
+                if (!c.isBusy) totalIdleTicks += c.idleTicks;
+            });
+            
+            // Imbalance computation (Variance proxy)
+            let ratios = [];
+            let totalDemandsSum = 0;
+            for (let z in ZONES) {
+                let supply = Math.max(1, zoneSupply[z]);
+                let demand = zoneDemand[z];
+                totalDemandsSum += demand;
+                ratios.push(demand / supply);
+            }
+            let mean = ratios.reduce((a, b) => a + b, 0) / ratios.length;
+            let variance = ratios.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / ratios.length;
+            let imbalancePercent = Math.min(100.0, Math.round(variance * 100 * 10) / 10);
+            
+            // Delay Rate computation
+            let delayRatePercent = totalDeliveriesCount > 0 ? Math.round((activeOrdersList.filter(o => o.eta < 0).length / Math.max(1, activeOrdersList.length)) * 100) : 0;
+            
+            // Assignment Accuracy
+            let accuracyPercent = 100 - Math.min(50, Math.round((pendingOrdersList.length / Math.max(1, couriersList.length)) * 25));
+
+            // Write stats to UI elements
+            document.getElementById('metric-avg-delivery').innerHTML = `${avgDeliveryVal.toFixed(2)} <span class="text-xs text-neutral-400 font-light font-sans">adım</span>`;
+            document.getElementById('metric-courier-idle').innerHTML = `${totalIdleTicks} <span class="text-xs text-neutral-400 font-light font-sans">adım</span>`;
+            document.getElementById('metric-imbalance').innerText = `${imbalancePercent.toFixed(1)}%`;
+            document.getElementById('metric-delay-rate').innerText = `${delayRatePercent}%`;
+            document.getElementById('metric-accuracy').innerText = `${accuracyPercent}%`;
+
+            // Adjust telemetry bars
+            document.getElementById('bar-avg-delivery').style.width = Math.min(100, (avgDeliveryVal / 25) * 100) + '%';
+            document.getElementById('bar-courier-idle').style.width = Math.min(100, (totalIdleTicks / 150) * 100) + '%';
+            document.getElementById('bar-imbalance').style.width = imbalancePercent + '%';
+            document.getElementById('bar-delay-rate').style.width = delayRatePercent + '%';
+            document.getElementById('bar-accuracy').style.width = accuracyPercent + '%';
+
+            // Active counts
+            document.getElementById('system-active-tasks').innerText = activeOrdersList.length + pendingOrdersList.length;
+
+            // Update regional rules values
+            for (let zone in ZONES) {
+                let mult = zonePayoutMultiplier[zone];
+                let cong = Math.round(zoneCongestion[zone] * 100);
+                let supply = zoneSupply[zone];
+                let demand = zoneDemand[zone];
+                
+                const surgeLbl = document.getElementById(`surge-${zone}`);
+                surgeLbl.innerText = `x${mult.toFixed(2)}`;
+                if (mult > 1.25) {
+                    surgeLbl.className = "text-amber-500 font-bold terminal-font";
+                } else {
+                    surgeLbl.className = "text-emerald-400 font-bold terminal-font";
+                }
+                
+                document.getElementById(`ratio-${zone}`).innerText = `${supply} kurye / ${demand} sip.`;
+                document.getElementById(`cong-${zone}`).innerText = `${cong}%`;
+            }
+        }
+
+        // Live JSON Terminal Contract Renderer
+        function updateTerminalDisplay(decision) {
+            const terminal = document.getElementById('json-decision-terminal');
+            
+            // Format prettified glowing JSON text
+            let rawJson = JSON.stringify(decision, null, 2);
+            
+            // Highlight properties for sleek Vantablack aesthetics
+            let highlighted = rawJson
+                .replace(/"orderId":\s*"([^"]+)"/g, '"orderId": "<span class="text-sky-400 font-semibold">$1</span>"')
+                .replace(/"courierId":\s*"([^"]+)"/g, '"courierId": "<span class="text-teal-400 font-semibold">$1</span>"')
+                .replace(/"eta":\s*(\d+)/g, '"eta": <span class="text-amber-400 font-bold">$1</span>')
+                .replace(/"mode":\s*"([^"]+)"/g, (match, p1) => {
+                    let color = p1 === 'live' ? 'text-emerald-400' : 'text-blue-400';
+                    return `"mode": "<span class="${color} font-bold">${p1}</span>"`;
+                })
+                .replace(/"reason":/g, '"<span class="text-purple-400">reason</span>":');
+
+            terminal.innerHTML = `<pre class="terminal-font text-white/90 leading-relaxed">${highlighted}</pre>`;
+        }
+
+        // Reset map zoom HUD function
+        function resetMapZoom() {
+            logAdaptation("HARİTA AYARI: Harita varsayılan zoom ayarlarına döndürüldü.");
+        }
+
+        // TACTICAL CANVAS GRAPHICS RENDERING
+        let canvas = null;
+        let ctx = null;
+
+        function setupCanvas() {
+            canvas = document.getElementById('logistic-map');
+            ctx = canvas.getContext('2d');
+            
+            // Run rendering frame
+            requestAnimationFrame(drawMapFrame);
+        }
+
+        function drawMapFrame() {
+            if (!ctx) return;
+            
+            // 1. Clear Screen with dark tactical background
+            ctx.fillStyle = '#060608';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 2. Draw TACTICAL Gridlines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+            ctx.lineWidth = 1;
+            const gridSize = 40;
+            for (let x = 0; x < canvas.width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            for (let y = 0; y < canvas.height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+
+            // 3. Draw connecting roads pathways between zones
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 2.5;
+            ctx.setLineDash([4, 6]);
+            
+            // Beşiktaş - Üsküdar
+            ctx.beginPath();
+            ctx.moveTo(ZONES["Beşiktaş"].x, ZONES["Beşiktaş"].y);
+            ctx.lineTo(ZONES["Üsküdar"].x, ZONES["Üsküdar"].y);
+            ctx.stroke();
+
+            // Üsküdar - Kadıköy
+            ctx.beginPath();
+            ctx.moveTo(ZONES["Üsküdar"].x, ZONES["Üsküdar"].y);
+            ctx.lineTo(ZONES["Kadıköy"].x, ZONES["Kadıköy"].y);
+            ctx.stroke();
+
+            // Beşiktaş - Kadıköy
+            ctx.beginPath();
+            ctx.moveTo(ZONES["Beşiktaş"].x, ZONES["Beşiktaş"].y);
+            ctx.lineTo(ZONES["Kadıköy"].x, ZONES["Kadıköy"].y);
+            ctx.stroke();
+            
+            ctx.setLineDash([]); // Reset dash
+
+            // 4. Draw regional bounding circles (Geofences)
+            for (let z in ZONES) {
+                let zone = ZONES[z];
+                let surgeMult = zonePayoutMultiplier[z];
+                let isSurging = surgeMult > 1.25;
+                
+                // Draw glow zone circle
+                let gradient = ctx.createRadialGradient(zone.x, zone.y, 10, zone.x, zone.y, zone.radius);
+                if (isSurging) {
+                    gradient.addColorStop(0, 'rgba(245, 158, 11, 0.12)');
+                    gradient.addColorStop(1, 'rgba(245, 158, 11, 0.0)');
+                    ctx.strokeStyle = 'rgba(245, 158, 11, 0.35)';
+                } else {
+                    gradient.addColorStop(0, zone.color);
+                    gradient.addColorStop(1, 'rgba(0,0,0,0)');
+                    ctx.strokeStyle = zone.border;
+                }
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(zone.x, zone.y, zone.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Draw boundary ring
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(zone.x, zone.y, zone.radius, 0, Math.PI * 2);
+                ctx.stroke();
+
+                // Draw Zone Tag Label
+                ctx.fillStyle = isSurging ? '#f59e0b' : '#a3a3a3';
+                ctx.font = 'bold 10px Inter';
+                ctx.fillText(z.toUpperCase(), zone.x - 26, zone.y - zone.radius + 15);
+                
+                // If surging show surge pill
+                if (isSurging) {
+                    ctx.fillStyle = '#f59e0b';
+                    ctx.font = '9px JetBrains Mono';
+                    ctx.fillText(`SURGE x${surgeMult.toFixed(2)}`, zone.x - 30, zone.y - zone.radius + 28);
+                }
+            }
+
+            // 5. Draw Pending Orders (Pickup targets flashing)
+            pendingOrdersList.forEach(o => {
+                ctx.fillStyle = 'rgba(59, 130, 246, 0.8)';
+                ctx.beginPath();
+                ctx.arc(o.pX, o.pY, 4.5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Outer pulsing ring
+                ctx.strokeStyle = 'rgba(59, 130, 246, 0.3)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                let pulseRad = 5 + (Date.now() % 1000) / 100;
+                ctx.arc(o.pX, o.pY, pulseRad, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // Label
+                ctx.fillStyle = '#60a5fa';
+                ctx.font = '8px JetBrains Mono';
+                ctx.fillText(o.id, o.pX + 7, o.pY + 3);
+            });
+
+            // 6. Draw Active Orders Path Routing Lines & Flying Packages
+            activeOrdersList.forEach(o => {
+                // Route path line
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(o.pX, o.pY);
+                ctx.lineTo(o.dX, o.dY);
+                ctx.stroke();
+                
+                // Draw pickup and dropoff points
+                ctx.fillStyle = '#10b981'; // Green dropoff destination
+                ctx.beginPath();
+                ctx.arc(o.dX, o.dY, 4, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#ef4444'; // Red pickup source
+                ctx.beginPath();
+                ctx.arc(o.pX, o.pY, 4, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Flying parcel particle
+                let progress = o.animProgress;
+                let particleX, particleY;
+                
+                if (progress < 1.0) {
+                    // Particle moving from courier start to pickup
+                    let c = o.assignedCourier;
+                    particleX = c.x;
+                    particleY = c.y;
+                } else {
+                    // Particle moving from pickup to dropoff
+                    let ratio = progress - 1.0;
+                    particleX = o.pX + (o.dX - o.pX) * ratio;
+                    particleY = o.pY + (o.dY - o.pY) * ratio;
+                }
+                
+                // Draw packet icon dot
+                ctx.fillStyle = '#f59e0b';
+                ctx.beginPath();
+                ctx.arc(particleX, particleY, 5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 7px Inter';
+                ctx.fillText("📦", particleX - 4, particleY + 3);
+            });
+
+            // 7. Draw Courier Nodes
+            couriersList.forEach(c => {
+                ctx.fillStyle = c.isBusy ? '#ef4444' : '#10b981';
+                ctx.beginPath();
+                ctx.arc(c.x, c.y, 6.5, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Neon ring around nodes
+                ctx.strokeStyle = c.isBusy ? 'rgba(239, 68, 68, 0.5)' : 'rgba(16, 185, 129, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(c.x, c.y, 9, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // Name Tag and ID
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '9px Inter';
+                ctx.fillText(c.name, c.x + 12, c.y - 2);
+                
+                ctx.fillStyle = '#737373';
+                ctx.font = '7px JetBrains Mono';
+                ctx.fillText(c.id, c.x + 12, c.y + 7);
+            });
+
+            // Loop frame
+            requestAnimationFrame(drawMapFrame);
+        }
+
+        // Initialize on DOM load
+        window.addEventListener('DOMContentLoaded', initializeSystem);
+    </script>
+</body>
+</html>
